@@ -9,6 +9,9 @@ from dash.dependencies import Input, Output, State
 import requests
 import plotly.express as px
 import numpy as np
+import datetime as dt
+from datetime import timedelta
+
 
 app = dash.Dash()
 # server=app.server
@@ -146,10 +149,29 @@ pct_fig.add_trace(go.Bar(
 pct_fig.update_layout(barmode='stack')
 pct_fig.update_layout(title_text="Calorie Density Breakdown by Meal (%)", title_x=0.5)
 
+### Getting min, max, and default start, end dates for date picker
+
+# min will be the minimum date in calorie df, max will be today's date
+min_date = min(calorie_df['Date'])
+max_date = dt.datetime.today().strftime("%m/%d/%Y")
+
+# default dates will be one week from today to start, and today to finish
+start_date = max((dt.datetime.today()-timedelta(days=7)).strftime("%m/%d/%Y"),min_date)
+end_date = dt.datetime.today().strftime("%m/%d/%Y")
+
 ### App layout
 
 app.layout = html.Div([
         # create a div to store each graph
+        html.Div([
+        dcc.DatePickerRange(
+    start_date=start_date,
+    end_date=end_date,
+    calendar_orientation='vertical',
+    min_date_allowed = min_date,
+    max_date_allowed = max_date
+)
+        ]),
         html.Div([dcc.Graph(figure=cal_fig)]),
         html.Div([dcc.Graph(figure=weight_fig)]),
         html.Div([dcc.Graph(figure=exercise_fig)]),
