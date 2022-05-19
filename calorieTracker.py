@@ -22,6 +22,8 @@ calorie_df = pd.read_csv('./calorie_df.csv').fillna(0)
 calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
 calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
 calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
+calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+print(calorie_df)
 
 cal_fig = go.Figure()
 cal_fig.add_trace(go.Bar(
@@ -153,18 +155,22 @@ pct_fig.update_layout(title_text="Calorie Density Breakdown by Meal (%)", title_
 
 # min will be the minimum date in calorie df, max will be today's date
 min_date = min(calorie_df['Date'])
-max_date = dt.datetime.today().strftime("%m/%d/%Y")
-
+max_date = dt.datetime.today().date()
+test_date = (dt.datetime.today()-timedelta(days=7)).date()
+print('test',type(test_date),test_date)
 # default dates will be one week from today to start, and today to finish
-start_date = max((dt.datetime.today()-timedelta(days=7)).strftime("%m/%d/%Y"),min_date)
-end_date = dt.datetime.today().strftime("%m/%d/%Y")
+start_date = max((dt.datetime.today()-timedelta(days=7)).date(),min_date)
+end_date = dt.datetime.strptime(dt.datetime.today().strftime("%m/%d/%Y"),'%m/%d/%Y').date()
 
+print(calorie_df)
+print(type(calorie_df['Date'][0]))
+print(type(min_date),type(max_date),type(start_date),type(end_date))
 ### App layout
 
 app.layout = html.Div([
         # create a div to store each graph
         html.Div([
-        dcc.DatePickerRange(
+        dcc.DatePickerRange(id='my-date-range-picker',
     start_date=start_date,
     end_date=end_date,
     calendar_orientation='vertical',
@@ -172,12 +178,61 @@ app.layout = html.Div([
     max_date_allowed = max_date
 )
         ]),
-        html.Div([dcc.Graph(figure=cal_fig)]),
+        html.Div([dcc.Graph(id='cal-graph',figure=cal_fig)]),
         html.Div([dcc.Graph(figure=weight_fig)]),
         html.Div([dcc.Graph(figure=exercise_fig)]),
         html.Div([dcc.Graph(figure=pct_fig)])
 
 ])
+
+@app.callback(Output(component_id='cal-graph', component_property='figure'),
+              [Input(component_id='my-date-range-picker',component_property='start_date')],
+               [Input(component_id='my-date-range-picker',component_property='end_date')])
+
+def update_cal_graph(start,end):
+    calorie_df = pd.read_csv('./calorie_df.csv').fillna(0)
+    calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+
+    calorie_df = calorie_df[(calorie_df['Date']>=dt.datetime.strptime(start,'%Y-%m-%d').date()) & (calorie_df['Date']<=dt.datetime.strptime(end,'%Y-%m-%d').date())]
+    calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
+    calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
+    calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
+
+    cal_fig = go.Figure()
+    cal_fig.add_trace(go.Bar(
+        y=calorie_df.Daily_Green,
+        x=calorie_df.Date,
+        name='Green',
+        text=calorie_df['Daily_Green'],
+        marker=dict(
+            color='rgb(0,255,0)'
+        )
+    ))
+    cal_fig.add_trace(go.Bar(
+        y=calorie_df.Daily_Yellow,
+        x=calorie_df.Date,
+        name='Yellow',
+        text=calorie_df['Daily_Yellow'],
+        marker=dict(
+            color='rgb(242,242,19)'
+            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
+        )
+    ))
+    cal_fig.add_trace(go.Bar(
+        y=calorie_df.Daily_Red,
+        x=calorie_df.Date,
+        name='Red',
+        text=calorie_df['Daily_Red'],
+        marker=dict(
+            color='rgb(246, 78, 139)'
+            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
+        )
+    ))
+    cal_fig.update_layout(barmode='stack')
+    cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', title_x=0.5)
+
+    return cal_fig
+
 
 # run app
 if __name__=="__main__":
