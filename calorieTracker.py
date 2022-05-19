@@ -20,35 +20,66 @@ calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - 
 calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
 calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
 
-colors = ['green','gold','red']
-fig = px.bar(calorie_df, x="Date", y=["Daily_Green", "Daily_Yellow", "Daily_Red"], title="Daily Calorie Density Intake Breakdown")
+cal_fig = go.Figure()
+cal_fig.add_trace(go.Bar(
+    y=calorie_df.Daily_Green,
+    x=calorie_df.Date,
+    name='Green',
+    text=calorie_df['Daily_Green'],
+    marker=dict(
+        color='rgb(0,255,0)'
+    )
+))
+cal_fig.add_trace(go.Bar(
+    y=calorie_df.Daily_Yellow,
+    x=calorie_df.Date,
+    name='Yellow',
+    text=calorie_df['Daily_Yellow'],
+    marker=dict(
+        color='rgb(242,242,19)'
+        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
+    )
+))
+cal_fig.add_trace(go.Bar(
+    y=calorie_df.Daily_Red,
+    x=calorie_df.Date,
+    name='Red',
+    text=calorie_df['Daily_Red'],
+    marker=dict(
+        color='rgb(246, 78, 139)'
+        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
+    )
+))
+cal_fig.update_layout(barmode='stack')
+cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', title_x=0.5)
 
 ### weight plot
 
 weight_df = pd.read_csv('./weight_df.csv')
-fig2 = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
-fig2.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
-fig2.update_layout(yaxis_range=[150,170])
+weight_fig = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
+weight_fig.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
+weight_fig.update_layout(yaxis_range=[150,170])
+weight_fig.update_layout(title_text="Weight Over Time", title_x=0.5)
 
 annotation = {
-    'xref': 'paper',  # we'll reference the paper which we draw plot
-    'yref': 'paper',  # we'll reference the paper which we draw plot
-    'x': 0.05,  # If we consider the x-axis as 100%, we will place it on the x-axis with how many %
-    'y': 0.27,  # If we consider the y-axis as 100%, we will place it on the y-axis with how many %
+    'xref': 'paper',
+    'yref': 'paper',
+    'x': 0.05,
+    'y': 0.27,
     'text': 'Goal weight: 155 lb',
     'showarrow': False,
     'arrowhead': 0,
-    # 'font': {'size': 10, 'color': 'black'}
 }
 
-fig2.update_layout({'annotations': [annotation]})
+weight_fig.update_layout({'annotations': [annotation]})
 
 
 ### exercise plot
 
 exercise_df = pd.read_csv('./exercise_df.csv')
-fig3 = px.line(exercise_df, x="Date", y="Calories Burned", title='Calories Burned From Exercise',markers=True)
-fig3.update_layout(yaxis_range=[0,1500])
+exercise_fig = px.line(exercise_df, x="Date", y="Calories Burned",markers=True)
+exercise_fig.update_layout(yaxis_range=[0,1500])
+exercise_fig.update_layout(title_text="Calories Burned From Exercise", title_x=0.5)
 
 ### calorie breakdown chart
 
@@ -79,8 +110,8 @@ d2= {'Green': [breakfast_green_pct,lunch_green_pct,dinner_green_pct,snacks_green
                   }
 
 d = pd.DataFrame(data=d2, index=['Breakfast','Lunch','Dinner','Snacks']).round(2)
-fig4 = go.Figure()
-fig4.add_trace(go.Bar(
+pct_fig = go.Figure()
+pct_fig.add_trace(go.Bar(
     y=d.index,
     x=d['Green'],
     name='Green',
@@ -90,7 +121,7 @@ fig4.add_trace(go.Bar(
         color='rgb(0,255,0)'
     )
 ))
-fig4.add_trace(go.Bar(
+pct_fig.add_trace(go.Bar(
     y=d.index,
     x=d['Yellow'],
     name='Yellow',
@@ -101,7 +132,7 @@ fig4.add_trace(go.Bar(
         # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
-fig4.add_trace(go.Bar(
+pct_fig.add_trace(go.Bar(
     y=d.index,
     x=d['Red'],
     name='Red',
@@ -112,25 +143,20 @@ fig4.add_trace(go.Bar(
         # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
-fig4.update_layout(barmode='stack')
+pct_fig.update_layout(barmode='stack')
+pct_fig.update_layout(title_text="Calorie Density Breakdown by Meal (%)", title_x=0.5)
 
-### alt method for bar chart
-
-# fig = go.Figure(data=[go.Bar(
-#     x=calorie_df['Date'],
-#     y=,
-#     marker_color=colors # marker color can be a single color value or an iterable
-# )])
-# fig.update_layout(title_text='Least Used Feature')
+### App layout
 
 app.layout = html.Div([
-        html.Div([dcc.Graph(figure=fig)]),
-        html.Div([dcc.Graph(figure=fig2)]),
-        html.Div([dcc.Graph(figure=fig3)]),
-        html.Div([dcc.Graph(figure=fig4)])
+        # create a div to store each graph
+        html.Div([dcc.Graph(figure=cal_fig)]),
+        html.Div([dcc.Graph(figure=weight_fig)]),
+        html.Div([dcc.Graph(figure=exercise_fig)]),
+        html.Div([dcc.Graph(figure=pct_fig)])
 
 ])
 
-
+# run app
 if __name__=="__main__":
     app.run_server()
