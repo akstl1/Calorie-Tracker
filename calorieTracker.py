@@ -30,6 +30,20 @@ fig2 = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',ma
 fig2.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
 fig2.update_layout(yaxis_range=[150,170])
 
+annotation = {
+    'xref': 'paper',  # we'll reference the paper which we draw plot
+    'yref': 'paper',  # we'll reference the paper which we draw plot
+    'x': 0.05,  # If we consider the x-axis as 100%, we will place it on the x-axis with how many %
+    'y': 0.27,  # If we consider the y-axis as 100%, we will place it on the y-axis with how many %
+    'text': 'Goal weight: 155 lb',
+    'showarrow': False,
+    'arrowhead': 0,
+    # 'font': {'size': 10, 'color': 'black'}
+}
+
+fig2.update_layout({'annotations': [annotation]})
+
+
 ### exercise plot
 
 exercise_df = pd.read_csv('./exercise_df.csv')
@@ -39,50 +53,60 @@ fig3.update_layout(yaxis_range=[0,1500])
 ### calorie breakdown chart
 
 breakfast_total = sum(calorie_df['Breakfast - Green']+calorie_df['Breakfast - Yellow']+calorie_df['Breakfast - Red'])
-breakfast_green_pct = sum(calorie_df['Breakfast - Green'])/breakfast_total
-breakfast_yellow_pct = sum(calorie_df['Breakfast - Yellow'])/breakfast_total
-breakfast_red_pct = sum(calorie_df['Breakfast - Red'])/breakfast_total
+breakfast_green_pct = 100*sum(calorie_df['Breakfast - Green'])/breakfast_total
+breakfast_yellow_pct = 100*sum(calorie_df['Breakfast - Yellow'])/breakfast_total
+breakfast_red_pct = 100*sum(calorie_df['Breakfast - Red'])/breakfast_total
 
 lunch_total = sum(calorie_df['Lunch - Green']+calorie_df['Lunch - Yellow']+calorie_df['Lunch - Red'])
-lunch_green_pct = sum(calorie_df['Lunch - Green'])/lunch_total
-lunch_yellow_pct = sum(calorie_df['Lunch - Yellow'])/lunch_total
-lunch_red_pct = sum(calorie_df['Lunch - Red'])/lunch_total
+lunch_green_pct = 100*sum(calorie_df['Lunch - Green'])/lunch_total
+lunch_yellow_pct = 100*sum(calorie_df['Lunch - Yellow'])/lunch_total
+lunch_red_pct = 100*sum(calorie_df['Lunch - Red'])/lunch_total
 
 dinner_total = sum(calorie_df['Dinner - Green']+calorie_df['Dinner - Yellow']+calorie_df['Dinner - Red'])
-dinner_green_pct = sum(calorie_df['Dinner - Green'])/dinner_total
-dinner_yellow_pct = sum(calorie_df['Dinner - Yellow'])/dinner_total
-dinner_red_pct = sum(calorie_df['Dinner - Red'])/dinner_total
+dinner_green_pct = 100*sum(calorie_df['Dinner - Green'])/dinner_total
+dinner_yellow_pct = 100*sum(calorie_df['Dinner - Yellow'])/dinner_total
+dinner_red_pct = 100* sum(calorie_df['Dinner - Red'])/dinner_total
 
 snack_total = sum(calorie_df['Snacks - Green']+calorie_df['Snacks - Yellow']+calorie_df['Snacks - Red'])
-snacks_green_pct = sum(calorie_df['Snacks - Green'])/snack_total
-snacks_yellow_pct = sum(calorie_df['Snacks - Yellow'])/snack_total
-snacks_red_pct = sum(calorie_df['Snacks - Red'])/snack_total
+snacks_green_pct = 100*sum(calorie_df['Snacks - Green'])/snack_total
+snacks_yellow_pct = 100*sum(calorie_df['Snacks - Yellow'])/snack_total
+snacks_red_pct = 100*sum(calorie_df['Snacks - Red'])/snack_total
 
+d2= {'Green': [breakfast_green_pct,lunch_green_pct,dinner_green_pct,snacks_green_pct],
+     'Yellow': [breakfast_yellow_pct,lunch_yellow_pct,dinner_yellow_pct,snacks_yellow_pct],
+     'Red':[breakfast_red_pct,lunch_red_pct,dinner_red_pct, snacks_red_pct]
+
+                  }
+
+d = pd.DataFrame(data=d2, index=['Breakfast','Lunch','Dinner','Snacks']).round(2)
 fig4 = go.Figure()
 fig4.add_trace(go.Bar(
-    y=['Breakfast', 'Lunch', 'Dinner', 'Snacks'],
-    x=[breakfast_green_pct,lunch_green_pct,dinner_green_pct,snacks_green_pct],
+    y=d.index,
+    x=d['Green'],
     name='Green',
     orientation='h',
+    text=d['Green'],
     marker=dict(
         color='rgb(0,255,0)'
     )
 ))
 fig4.add_trace(go.Bar(
-    y=['Breakfast', 'Lunch', 'Dinner', 'Snacks'],
-    x=[breakfast_yellow_pct,lunch_yellow_pct,dinner_yellow_pct,snacks_yellow_pct],
+    y=d.index,
+    x=d['Yellow'],
     name='Yellow',
     orientation='h',
+    text=d['Yellow'],
     marker=dict(
         color='rgb(242,242,19)'
         # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
 fig4.add_trace(go.Bar(
-    y=['Breakfast', 'Lunch', 'Dinner', 'Snacks'],
-    x=[breakfast_red_pct,lunch_red_pct,dinner_red_pct,snacks_red_pct],
+    y=d.index,
+    x=d['Red'],
     name='Red',
     orientation='h',
+    text=d['Red'],
     marker=dict(
         color='rgb(246, 78, 139)'
         # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
