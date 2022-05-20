@@ -1,12 +1,9 @@
-import pokebase as pb
-import webbrowser
 import dash
 from dash import html
 from dash import dcc
 import pandas as pd
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output, State
-import requests
 import plotly.express as px
 import numpy as np
 import datetime as dt
@@ -188,8 +185,8 @@ app.layout = html.Div([
     min_date_allowed = min_date,
     max_date_allowed = max_date
 )
-        ]),
-        html.Div([dcc.Graph(id='cal-graph',figure=cal_fig)], style={'text-align':'center'}),
+        ], style={'text-align':'center'}),
+        html.Div([dcc.Graph(id='cal-graph',figure=cal_fig)]),
         html.Div([dcc.Graph(id='weight-graph',figure=weight_fig)]),
         html.Div([dcc.Graph(id='exercise-graph',figure=exercise_fig)]),
         html.Div([dcc.Graph(id='pct-graph',figure=pct_fig)])
