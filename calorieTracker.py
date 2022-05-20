@@ -11,7 +11,7 @@ from datetime import timedelta
 
 
 app = dash.Dash()
-# server=app.server
+server=app.server
 
 ### calorie plot
 calorie_df = pd.read_csv('./calorie_df.csv').fillna(0)
@@ -53,6 +53,7 @@ cal_fig.add_trace(go.Bar(
 ))
 cal_fig.update_layout(barmode='stack')
 cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', title_x=0.5)
+
 
 ### weight plot
 
