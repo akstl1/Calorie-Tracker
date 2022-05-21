@@ -8,7 +8,7 @@ import plotly.express as px
 import numpy as np
 import datetime as dt
 from datetime import timedelta
-
+from firebase_admin import db
 
 app = dash.Dash()
 server=app.server
