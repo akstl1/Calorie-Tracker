@@ -9,6 +9,13 @@ import numpy as np
 import datetime as dt
 from datetime import timedelta
 from firebase_admin import db
+import os
+from dotenv import load_dotenv
+
+# load_dotenv()
+#
+# ref = db.reference(os.getenv('db_name'))
+# print(ref.get())
 
 app = dash.Dash()
 server=app.server
