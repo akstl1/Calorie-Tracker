@@ -21,19 +21,19 @@ app = dash.Dash()
 server=app.server
 
 ### calorie plot
-calorie_df = pd.read_excel('./calorie_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
+calorie_df = pd.read_excel('./data_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
 
-calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
-calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
-calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
-# calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+calorie_df['Daily_Green'] = calorie_df.Breakfast_Green+calorie_df.Lunch_Green+calorie_df.Dinner_Green+calorie_df.Snacks_Green
+calorie_df['Daily_Yellow'] = calorie_df.Breakfast_Yellow+calorie_df.Lunch_Yellow+calorie_df.Dinner_Yellow+calorie_df.Snacks_Yellow
+calorie_df['Daily_Red'] = calorie_df.Breakfast_Red+calorie_df.Lunch_Red+calorie_df.Dinner_Red+calorie_df.Snacks_Red
+# calorie_df.Date = calorie_df.Date.apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
 
 cal_fig = go.Figure()
 cal_fig.add_trace(go.Bar(
     y=calorie_df.Daily_Green,
     x=calorie_df.Date,
     name='Green',
-    text=calorie_df['Daily_Green'],
+    text=calorie_df.Daily_Green,
     marker=dict(
         color='rgb(0,255,0)'
     )
@@ -42,7 +42,7 @@ cal_fig.add_trace(go.Bar(
     y=calorie_df.Daily_Yellow,
     x=calorie_df.Date,
     name='Yellow',
-    text=calorie_df['Daily_Yellow'],
+    text=calorie_df.Daily_Yellow,
     marker=dict(
         color='rgb(242,242,19)'
     )
@@ -51,7 +51,7 @@ cal_fig.add_trace(go.Bar(
     y=calorie_df.Daily_Red,
     x=calorie_df.Date,
     name='Red',
-    text=calorie_df['Daily_Red'],
+    text=calorie_df.Daily_Red,
     marker=dict(
         color='rgb(246, 78, 139)'
     )
@@ -62,7 +62,7 @@ cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', 
 
 ### weight plot
 
-weight_df = pd.read_excel('./calorie_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
+weight_df = pd.read_excel('./data_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
 weight_fig = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
 weight_fig.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
 weight_fig.update_layout(yaxis_range=[150,170])
@@ -83,43 +83,43 @@ weight_fig.update_layout({'annotations': [annotation]})
 
 ### exercise plot
 
-exercise_df = pd.read_excel('./calorie_df.xlsx', 'exercise_df',converters = {'Date':dt.datetime.date})
+exercise_df = pd.read_excel('./data_df.xlsx', 'exercise_df',converters = {'Date':dt.datetime.date})
 
 exercise_fig = px.line(exercise_df, x="Date", y="Steps",markers=True)
 exercise_fig.update_layout(yaxis_range=[0,1500])
-exercise_fig.update_layout(title_text="Step", title_x=0.5)
+exercise_fig.update_layout(title_text="Steps", title_x=0.5)
 
 ### calorie breakdown chart
 
-breakfast_total = sum(calorie_df['Breakfast - Green']+calorie_df['Breakfast - Yellow']+calorie_df['Breakfast - Red'])
+breakfast_total = sum(calorie_df.Breakfast_Green+calorie_df.Breakfast_Yellow+calorie_df.Breakfast_Red)
 if breakfast_total:
-    breakfast_green_pct = 100*sum(calorie_df['Breakfast - Green'])/breakfast_total
-    breakfast_yellow_pct = 100*sum(calorie_df['Breakfast - Yellow'])/breakfast_total
-    breakfast_red_pct = 100*sum(calorie_df['Breakfast - Red'])/breakfast_total
+    breakfast_green_pct = 100*sum(calorie_df.Breakfast_Green)/breakfast_total
+    breakfast_yellow_pct = 100*sum(calorie_df.Breakfast_Yellow)/breakfast_total
+    breakfast_red_pct = 100*sum(calorie_df.Breakfast_Red)/breakfast_total
 else:
     breakfast_green_pct,breakfast_yellow_pct,breakfast_red_pct =0,0,0
 
-lunch_total = sum(calorie_df['Lunch - Green']+calorie_df['Lunch - Yellow']+calorie_df['Lunch - Red'])
+lunch_total = sum(calorie_df.Lunch_Green+calorie_df.Lunch_Yellow+calorie_df.Lunch_Red)
 if lunch_total:
-    lunch_green_pct = 100*sum(calorie_df['Lunch - Green'])/lunch_total
-    lunch_yellow_pct = 100*sum(calorie_df['Lunch - Yellow'])/lunch_total
-    lunch_red_pct = 100*sum(calorie_df['Lunch - Red'])/lunch_total
+    lunch_green_pct = 100*sum(calorie_df.Lunch_Green)/lunch_total
+    lunch_yellow_pct = 100*sum(calorie_df.Lunch_Yellow)/lunch_total
+    lunch_red_pct = 100*sum(calorie_df.Lunch_Red)/lunch_total
 else:
     lunch_green_pct,lunch_yellow_pct,lunch_red_pct=0,0,0
 
-dinner_total = sum(calorie_df['Dinner - Green']+calorie_df['Dinner - Yellow']+calorie_df['Dinner - Red'])
+dinner_total = sum(calorie_df.Dinner_Green+calorie_df.Dinner_Yellow+calorie_df.Dinner_Red)
 if dinner_total:
-    dinner_green_pct = 100*sum(calorie_df['Dinner - Green'])/dinner_total
-    dinner_yellow_pct = 100*sum(calorie_df['Dinner - Yellow'])/dinner_total
-    dinner_red_pct = 100* sum(calorie_df['Dinner - Red'])/dinner_total
+    dinner_green_pct = 100*sum(calorie_df.Dinner_Green)/dinner_total
+    dinner_yellow_pct = 100*sum(calorie_df.Dinner_Yellow)/dinner_total
+    dinner_red_pct = 100* sum(calorie_df.Dinner_Red)/dinner_total
 else:
     dinner_green_pct,dinner_yellow_pct,dinner_red_pct=0,0,0
 
-snack_total = sum(calorie_df['Snacks - Green']+calorie_df['Snacks - Yellow']+calorie_df['Snacks - Red'])
+snack_total = sum(calorie_df.Snacks_Green+calorie_df.Snacks_Yellow+calorie_df.Snacks_Red)
 if snack_total:
-    snacks_green_pct = 100*sum(calorie_df['Snacks - Green'])/snack_total
-    snacks_yellow_pct = 100*sum(calorie_df['Snacks - Yellow'])/snack_total
-    snacks_red_pct = 100*sum(calorie_df['Snacks - Red'])/snack_total
+    snacks_green_pct = 100*sum(calorie_df.Snacks_Green)/snack_total
+    snacks_yellow_pct = 100*sum(calorie_df.Snacks_Yellow)/snack_total
+    snacks_red_pct = 100*sum(calorie_df.Snacks_Red)/snack_total
 else:
     snacks_green_pct,snacks_yellow_pct,snacks_red_pct=0,0,0
 
@@ -133,30 +133,30 @@ d = pd.DataFrame(data=d2, index=['Breakfast','Lunch','Dinner','Snacks']).round(2
 pct_fig = go.Figure()
 pct_fig.add_trace(go.Bar(
     y=d.index,
-    x=d['Green'],
+    x=d.Green,
     name='Green',
     orientation='h',
-    text=d['Green'],
+    text=d.Green,
     marker=dict(
         color='rgb(0,255,0)'
     )
 ))
 pct_fig.add_trace(go.Bar(
     y=d.index,
-    x=d['Yellow'],
+    x=d.Yellow,
     name='Yellow',
     orientation='h',
-    text=d['Yellow'],
+    text=d.Yellow,
     marker=dict(
         color='rgb(242,242,19)'
     )
 ))
 pct_fig.add_trace(go.Bar(
     y=d.index,
-    x=d['Red'],
+    x=d.Red,
     name='Red',
     orientation='h',
-    text=d['Red'],
+    text=d.Red,
     marker=dict(
         color='rgb(246, 78, 139)'
     )
@@ -167,7 +167,7 @@ pct_fig.update_layout(title_text="Calorie Density Breakdown by Meal (%)", title_
 ### Getting min, max, and default start, end dates for date picker
 
 # min will be the minimum date in calorie df, max will be today's date
-min_date = min(calorie_df['Date'])
+min_date = min(calorie_df.Date)
 max_date = dt.datetime.today().date()
 test_date = (dt.datetime.today()-timedelta(days=7)).date()
 
@@ -206,19 +206,19 @@ def update_cal_graph(start_date,end_date):
 
     start_date = dt.datetime.strptime(start_date,'%Y-%m-%d').date()
     end_date = dt.datetime.strptime(end_date,'%Y-%m-%d').date()
-    calorie_df = pd.read_excel('./calorie_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
-    calorie_df = calorie_df[(calorie_df['Date']>=start_date) & (calorie_df['Date']<=end_date)]
+    calorie_df = pd.read_excel('./data_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
+    calorie_df = calorie_df[(calorie_df.Date>=start_date) & (calorie_df.Date<=end_date)]
 
-    calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
-    calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
-    calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
+    calorie_df['Daily_Green'] = calorie_df.Breakfast_Green+calorie_df.Lunch_Green+calorie_df.Dinner_Green+calorie_df.Snacks_Green
+    calorie_df['Daily_Yellow'] = calorie_df.Breakfast_Yellow+calorie_df.Lunch_Yellow+calorie_df.Dinner_Yellow+calorie_df.Snacks_Yellow
+    calorie_df['Daily_Red'] = calorie_df.Breakfast_Red+calorie_df.Lunch_Red+calorie_df.Dinner_Red+calorie_df.Snacks_Red
 
     cal_fig = go.Figure()
     cal_fig.add_trace(go.Bar(
         y=calorie_df.Daily_Green,
         x=calorie_df.Date,
         name='Green',
-        text=calorie_df['Daily_Green'],
+        text=calorie_df.Daily_Green,
         marker=dict(
             color='rgb(0,255,0)'
         )
@@ -227,7 +227,7 @@ def update_cal_graph(start_date,end_date):
         y=calorie_df.Daily_Yellow,
         x=calorie_df.Date,
         name='Yellow',
-        text=calorie_df['Daily_Yellow'],
+        text=calorie_df.Daily_Yellow,
         marker=dict(
             color='rgb(242,242,19)'
         )
@@ -236,7 +236,7 @@ def update_cal_graph(start_date,end_date):
         y=calorie_df.Daily_Red,
         x=calorie_df.Date,
         name='Red',
-        text=calorie_df['Daily_Red'],
+        text=calorie_df.Daily_Red,
         marker=dict(
             color='rgb(246, 78, 139)'
         )
@@ -251,8 +251,8 @@ def update_cal_graph(start_date,end_date):
 
     ### weight plot
 
-    weight_df = pd.read_excel('./calorie_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
-    weight_df = weight_df[(weight_df['Date']>=start_date) & (weight_df['Date']<=end_date)]
+    weight_df = pd.read_excel('./data_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
+    weight_df = weight_df[(weight_df.Date>=start_date) & (weight_df.Date<=end_date)]
     weight_fig = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
     weight_fig.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
     weight_fig.update_layout(yaxis_range=[150,170])
@@ -274,12 +274,12 @@ def update_cal_graph(start_date,end_date):
 
     ### exercise plot
 
-    exercise_df = pd.read_excel('./calorie_df.xlsx','exercise_df', converters = {'Date':dt.datetime.date})
-    exercise_df = exercise_df[(exercise_df['Date']>=start_date) & (exercise_df['Date']<=end_date)]
+    exercise_df = pd.read_excel('./data_df.xlsx','exercise_df', converters = {'Date':dt.datetime.date})
+    exercise_df = exercise_df[(exercise_df.Date>=start_date) & (exercise_df.Date<=end_date)]
 
     exercise_fig = px.line(exercise_df, x="Date", y="Steps",markers=True)
     exercise_fig.update_layout(yaxis_range=[0,25000])
-    exercise_fig.update_layout(title_text="Step", title_x=0.5)
+    exercise_fig.update_layout(title_text="Steps", title_x=0.5)
     exercise_fig.add_hline(y=10000,line=dict(color='royalblue', width=4, dash='dot'))
     annotation = {
         'xref': 'paper',
@@ -297,35 +297,35 @@ def update_cal_graph(start_date,end_date):
 
     ### calorie breakdown chart
 
-    breakfast_total = sum(calorie_df['Breakfast - Green']+calorie_df['Breakfast - Yellow']+calorie_df['Breakfast - Red'])
+    breakfast_total = sum(calorie_df.Breakfast_Green+calorie_df.Breakfast_Yellow+calorie_df.Breakfast_Red)
     if breakfast_total:
-        breakfast_green_pct = 100*sum(calorie_df['Breakfast - Green'])/breakfast_total
-        breakfast_yellow_pct = 100*sum(calorie_df['Breakfast - Yellow'])/breakfast_total
-        breakfast_red_pct = 100*sum(calorie_df['Breakfast - Red'])/breakfast_total
+        breakfast_green_pct = 100*sum(calorie_df.Breakfast_Green)/breakfast_total
+        breakfast_yellow_pct = 100*sum(calorie_df.Breakfast_Yellow)/breakfast_total
+        breakfast_red_pct = 100*sum(calorie_df.Breakfast_Red)/breakfast_total
     else:
         breakfast_green_pct,breakfast_yellow_pct,breakfast_red_pct =0,0,0
 
-    lunch_total = sum(calorie_df['Lunch - Green']+calorie_df['Lunch - Yellow']+calorie_df['Lunch - Red'])
+    lunch_total = sum(calorie_df.Lunch_Green+calorie_df.Lunch_Yellow+calorie_df.Lunch_Red)
     if lunch_total:
-        lunch_green_pct = 100*sum(calorie_df['Lunch - Green'])/lunch_total
-        lunch_yellow_pct = 100*sum(calorie_df['Lunch - Yellow'])/lunch_total
-        lunch_red_pct = 100*sum(calorie_df['Lunch - Red'])/lunch_total
+        lunch_green_pct = 100*sum(calorie_df.Lunch_Green)/lunch_total
+        lunch_yellow_pct = 100*sum(calorie_df.Lunch_Yellow)/lunch_total
+        lunch_red_pct = 100*sum(calorie_df.Lunch_Red)/lunch_total
     else:
         lunch_green_pct,lunch_yellow_pct,lunch_red_pct=0,0,0
 
-    dinner_total = sum(calorie_df['Dinner - Green']+calorie_df['Dinner - Yellow']+calorie_df['Dinner - Red'])
+    dinner_total = sum(calorie_df.Dinner_Green+calorie_df.Dinner_Yellow+calorie_df.Dinner_Red)
     if dinner_total:
-        dinner_green_pct = 100*sum(calorie_df['Dinner - Green'])/dinner_total
-        dinner_yellow_pct = 100*sum(calorie_df['Dinner - Yellow'])/dinner_total
-        dinner_red_pct = 100* sum(calorie_df['Dinner - Red'])/dinner_total
+        dinner_green_pct = 100*sum(calorie_df.Dinner_Green)/dinner_total
+        dinner_yellow_pct = 100*sum(calorie_df.Dinner_Yellow)/dinner_total
+        dinner_red_pct = 100* sum(calorie_df.Dinner_Red)/dinner_total
     else:
         dinner_green_pct,dinner_yellow_pct,dinner_red_pct=0,0,0
 
-    snack_total = sum(calorie_df['Snacks - Green']+calorie_df['Snacks - Yellow']+calorie_df['Snacks - Red'])
+    snack_total = sum(calorie_df.Snacks_Green+calorie_df.Snacks_Yellow+calorie_df.Snacks_Red)
     if snack_total:
-        snacks_green_pct = 100*sum(calorie_df['Snacks - Green'])/snack_total
-        snacks_yellow_pct = 100*sum(calorie_df['Snacks - Yellow'])/snack_total
-        snacks_red_pct = 100*sum(calorie_df['Snacks - Red'])/snack_total
+        snacks_green_pct = 100*sum(calorie_df.Snacks_Green)/snack_total
+        snacks_yellow_pct = 100*sum(calorie_df.Snacks_Yellow)/snack_total
+        snacks_red_pct = 100*sum(calorie_df.Snacks_Red)/snack_total
     else:
         snacks_green_pct,snacks_yellow_pct,snacks_red_pct=0,0,0
 
@@ -339,30 +339,30 @@ def update_cal_graph(start_date,end_date):
     pct_fig = go.Figure()
     pct_fig.add_trace(go.Bar(
         y=d.index,
-        x=d['Green'],
+        x=d.Green,
         name='Green',
         orientation='h',
-        text=d['Green'],
+        text=d.Green,
         marker=dict(
             color='rgb(0,255,0)'
         )
     ))
     pct_fig.add_trace(go.Bar(
         y=d.index,
-        x=d['Yellow'],
+        x=d.Yellow,
         name='Yellow',
         orientation='h',
-        text=d['Yellow'],
+        text=d.Yellow,
         marker=dict(
             color='rgb(242,242,19)'
         )
     ))
     pct_fig.add_trace(go.Bar(
         y=d.index,
-        x=d['Red'],
+        x=d.Red,
         name='Red',
         orientation='h',
-        text=d['Red'],
+        text=d.Red,
         marker=dict(
             color='rgb(246, 78, 139)'
         )
