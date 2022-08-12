@@ -21,12 +21,12 @@ app = dash.Dash()
 server=app.server
 
 ### calorie plot
-calorie_df = pd.read_csv('./calorie_df.csv').fillna(0)
+calorie_df = pd.read_excel('./calorie_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
 
 calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
 calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
 calorie_df['Daily_Red'] = calorie_df['Breakfast - Red']+calorie_df['Lunch - Red']+calorie_df['Dinner - Red']+calorie_df['Snacks - Red']
-calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+# calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
 
 cal_fig = go.Figure()
 cal_fig.add_trace(go.Bar(
@@ -45,7 +45,6 @@ cal_fig.add_trace(go.Bar(
     text=calorie_df['Daily_Yellow'],
     marker=dict(
         color='rgb(242,242,19)'
-        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
 cal_fig.add_trace(go.Bar(
@@ -55,7 +54,6 @@ cal_fig.add_trace(go.Bar(
     text=calorie_df['Daily_Red'],
     marker=dict(
         color='rgb(246, 78, 139)'
-        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
 cal_fig.update_layout(barmode='stack')
@@ -64,8 +62,7 @@ cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', 
 
 ### weight plot
 
-weight_df = pd.read_csv('./weight_df.csv')
-weight_df['Date'] = weight_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+weight_df = pd.read_excel('./calorie_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
 weight_fig = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
 weight_fig.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
 weight_fig.update_layout(yaxis_range=[150,170])
@@ -86,12 +83,11 @@ weight_fig.update_layout({'annotations': [annotation]})
 
 ### exercise plot
 
-exercise_df = pd.read_csv('./exercise_df.csv')
-exercise_df['Date'] = exercise_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
+exercise_df = pd.read_excel('./calorie_df.xlsx', 'exercise_df',converters = {'Date':dt.datetime.date})
 
-exercise_fig = px.line(exercise_df, x="Date", y="Calories Burned",markers=True)
+exercise_fig = px.line(exercise_df, x="Date", y="Steps",markers=True)
 exercise_fig.update_layout(yaxis_range=[0,1500])
-exercise_fig.update_layout(title_text="Calories Burned From Exercise", title_x=0.5)
+exercise_fig.update_layout(title_text="Step", title_x=0.5)
 
 ### calorie breakdown chart
 
@@ -153,7 +149,6 @@ pct_fig.add_trace(go.Bar(
     text=d['Yellow'],
     marker=dict(
         color='rgb(242,242,19)'
-        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
 pct_fig.add_trace(go.Bar(
@@ -164,7 +159,6 @@ pct_fig.add_trace(go.Bar(
     text=d['Red'],
     marker=dict(
         color='rgb(246, 78, 139)'
-        # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
     )
 ))
 pct_fig.update_layout(barmode='stack')
@@ -176,10 +170,10 @@ pct_fig.update_layout(title_text="Calorie Density Breakdown by Meal (%)", title_
 min_date = min(calorie_df['Date'])
 max_date = dt.datetime.today().date()
 test_date = (dt.datetime.today()-timedelta(days=7)).date()
+
 # default dates will be one week from today to start, and today to finish
 start_date = max((dt.datetime.today()-timedelta(days=7)).date(),min_date)
 end_date = dt.datetime.strptime(dt.datetime.today().strftime("%m/%d/%Y"),'%m/%d/%Y').date()
-
 
 ### App layout
 
@@ -208,18 +202,12 @@ app.layout = html.Div([
               [Input(component_id='my-date-range-picker',component_property='start_date')],
                [Input(component_id='my-date-range-picker',component_property='end_date')])
 
-def update_cal_graph(start,end):
+def update_cal_graph(start_date,end_date):
 
-
-    calorie_df = pd.read_csv('./calorie_df.csv').fillna(0)
-    calorie_df['Date'] = calorie_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
-    calorie_df = calorie_df[(calorie_df['Date']>=dt.datetime.strptime(start,'%Y-%m-%d').date()) & (calorie_df['Date']<=dt.datetime.strptime(end,'%Y-%m-%d').date())]
-
-    # min_date = pd.to_datetime(calorie_df['Date'],format='%m/%d/%Y').date()
-    # print(min_date, 'hi')
-    # max_date = dt.datetime.today().date()
-    # interval = max_date - min_date
-    # interval = interval.days
+    start_date = dt.datetime.strptime(start_date,'%Y-%m-%d').date()
+    end_date = dt.datetime.strptime(end_date,'%Y-%m-%d').date()
+    calorie_df = pd.read_excel('./calorie_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
+    calorie_df = calorie_df[(calorie_df['Date']>=start_date) & (calorie_df['Date']<=end_date)]
 
     calorie_df['Daily_Green'] = calorie_df['Breakfast - Green']+calorie_df['Lunch - Green']+calorie_df['Dinner - Green']+calorie_df['Snacks - Green']
     calorie_df['Daily_Yellow'] = calorie_df['Breakfast - Yellow']+calorie_df['Lunch - Yellow']+calorie_df['Dinner - Yellow']+calorie_df['Snacks - Yellow']
@@ -242,7 +230,6 @@ def update_cal_graph(start,end):
         text=calorie_df['Daily_Yellow'],
         marker=dict(
             color='rgb(242,242,19)'
-            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
         )
     ))
     cal_fig.add_trace(go.Bar(
@@ -252,7 +239,6 @@ def update_cal_graph(start,end):
         text=calorie_df['Daily_Red'],
         marker=dict(
             color='rgb(246, 78, 139)'
-            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
         )
     ))
     cal_fig.update_layout(barmode='stack')
@@ -265,9 +251,8 @@ def update_cal_graph(start,end):
 
     ### weight plot
 
-    weight_df = pd.read_csv('./weight_df.csv')
-    weight_df['Date'] = weight_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
-    weight_df = weight_df[(weight_df['Date']>=dt.datetime.strptime(start,'%Y-%m-%d').date()) & (weight_df['Date']<=dt.datetime.strptime(end,'%Y-%m-%d').date())]
+    weight_df = pd.read_excel('./calorie_df.xlsx', 'weight_df',converters = {'Date':dt.datetime.date})
+    weight_df = weight_df[(weight_df['Date']>=start_date) & (weight_df['Date']<=end_date)]
     weight_fig = px.line(weight_df, x="Date", y="Weight (lb)", title='Weight Over Time',markers=True)
     weight_fig.add_hline(y=155,line=dict(color='royalblue', width=4, dash='dot'))
     weight_fig.update_layout(yaxis_range=[150,170])
@@ -289,16 +274,27 @@ def update_cal_graph(start,end):
 
     ### exercise plot
 
-    exercise_df = pd.read_csv('./exercise_df.csv')
-    exercise_df['Date'] = exercise_df['Date'].apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
-    exercise_df = exercise_df[(exercise_df['Date']>=dt.datetime.strptime(start,'%Y-%m-%d').date()) & (exercise_df['Date']<=dt.datetime.strptime(end,'%Y-%m-%d').date())]
-    exercise_fig = px.line(exercise_df, x="Date", y="Calories Burned",markers=True)
-    exercise_fig.update_layout(yaxis_range=[0,1500])
-    exercise_fig.update_layout(title_text="Calories Burned From Exercise", title_x=0.5)
+    exercise_df = pd.read_excel('./calorie_df.xlsx','exercise_df', converters = {'Date':dt.datetime.date})
+    exercise_df = exercise_df[(exercise_df['Date']>=start_date) & (exercise_df['Date']<=end_date)]
 
+    exercise_fig = px.line(exercise_df, x="Date", y="Steps",markers=True)
+    exercise_fig.update_layout(yaxis_range=[0,25000])
+    exercise_fig.update_layout(title_text="Step", title_x=0.5)
+    exercise_fig.add_hline(y=10000,line=dict(color='royalblue', width=4, dash='dot'))
+    annotation = {
+        'xref': 'paper',
+        'yref': 'paper',
+        'x': 0.05,
+        'y': 0.45,
+        'text': 'Goal steps: 10,000',
+        'showarrow': False,
+        'arrowhead': 0,
+    }
 
+    exercise_fig.update_layout({'annotations': [annotation]})
     exercise_fig.update_xaxes(dtick=86400000)
     exercise_fig.update_layout(xaxis=dict(tickformat="%m/%d/%Y"))
+
     ### calorie breakdown chart
 
     breakfast_total = sum(calorie_df['Breakfast - Green']+calorie_df['Breakfast - Yellow']+calorie_df['Breakfast - Red'])
@@ -359,7 +355,6 @@ def update_cal_graph(start,end):
         text=d['Yellow'],
         marker=dict(
             color='rgb(242,242,19)'
-            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
         )
     ))
     pct_fig.add_trace(go.Bar(
@@ -370,7 +365,6 @@ def update_cal_graph(start,end):
         text=d['Red'],
         marker=dict(
             color='rgb(246, 78, 139)'
-            # line=dict(color='rgba(246, 78, 139, 1.0)', width=3)
         )
     ))
     pct_fig.update_layout(barmode='stack')
