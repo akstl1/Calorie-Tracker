@@ -17,25 +17,20 @@ from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
+# load env variables
 load_dotenv()
-# load_dotenv()
-#
-# ref = db.reference(os.getenv('db_name'))
-# print(ref.get())
 
+# start up app, server
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, suppress_callback_exceptions=True)
 app.server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# for your home PostgreSQL test table
-# app.server.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:your_password@localhost/test"
 
 # for your live Heroku PostgreSQL database
 app.server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("URI")
 
 db = SQLAlchemy(app.server)
 
-
+# enter new row schema for db
 class Entry(db.Model):
     __tablename__ = 'nutrition_table'
 
