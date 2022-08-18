@@ -1,24 +1,80 @@
 import dash
-from dash import html
+from dash import html, dcc, dash_table
 from dash import dcc
+from dash.dependencies import Input, Output, State
+
 import pandas as pd
 import plotly.graph_objs as go
-from dash.dependencies import Input, Output, State
 import plotly.express as px
 import numpy as np
 import datetime as dt
 from datetime import timedelta
-from firebase_admin import db
+
 import os
 from dotenv import load_dotenv
 
+
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+
+load_dotenv()
 # load_dotenv()
 #
 # ref = db.reference(os.getenv('db_name'))
 # print(ref.get())
 
-app = dash.Dash()
-server=app.server
+server = Flask(__name__)
+app = dash.Dash(__name__, server=server, suppress_callback_exceptions=True)
+app.server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# for your home PostgreSQL test table
+# app.server.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:your_password@localhost/test"
+
+# for your live Heroku PostgreSQL database
+app.server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("URI")
+
+db = SQLAlchemy(app.server)
+
+
+class Entry(db.Model):
+    __tablename__ = 'nutrition_table'
+
+    Date = db.Column(db.Date, nullable=False, primary_key=True)
+    Breakfast_Green = db.Column(db.Integer, nullable=False)
+    Breakfast_Yellow = db.Column(db.Integer, nullable=False)
+    Breakfast_Red = db.Column(db.Integer, nullable=False)
+    Lunch_Green = db.Column(db.Integer, nullable=False)
+    Lunch_Yellow = db.Column(db.Integer, nullable=False)
+    Lunch_Red = db.Column(db.Integer, nullable=False)
+    Dinner_Green = db.Column(db.Integer, nullable=False)
+    Dinner_Yellow = db.Column(db.Integer, nullable=False)
+    Dinner_Red = db.Column(db.Integer, nullable=False)
+    Snacks_Green = db.Column(db.Integer, nullable=False)
+    Snacks_Yellow = db.Column(db.Integer, nullable=False)
+    Snacks_Red = db.Column(db.Integer, nullable=False)
+    Weight = db.Column(db.Numeric, nullable=False)
+    Steps = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, phone, version, price, sales):
+        self.Phone = phone
+        self.Version = version
+        self.Price = price
+        self.Sales = sales
+        self.Phone = phone
+        self.Version = version
+        self.Price = price
+        self.Sales = sales
+        self.Phone = phone
+        self.Version = version
+        self.Price = price
+        self.Sales = sales
+        self.Phone = phone
+        self.Version = version
+        self.Price = price
+
+# df = pd.read_sql_table('productlist', con=db.engine)
+# print(df)
+# ------------------------------------------------------------------------------------------------
 
 ### calorie plot
 calorie_df = pd.read_excel('./data_df.xlsx', 'calorie_df',converters = {'Date':dt.datetime.date}).fillna(0)
