@@ -50,25 +50,25 @@ class Entry(db.Model):
     Weight = db.Column(db.Numeric, nullable=False)
     Steps = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, phone, version, price, sales):
-        self.Phone = phone
-        self.Version = version
-        self.Price = price
-        self.Sales = sales
-        self.Phone = phone
-        self.Version = version
-        self.Price = price
-        self.Sales = sales
-        self.Phone = phone
-        self.Version = version
-        self.Price = price
-        self.Sales = sales
-        self.Phone = phone
-        self.Version = version
-        self.Price = price
+    def __init__(self, date, breakfast_green, breakfast_yellow, breakfast_red, lunch_green, lunch_yellow, lunch_red, dinner_green, dinner_yellow, dinner_red, snacks_green, snacks_yellow, snacks_red, weight, steps):
+        self.Date = date
+        self.Breakfast_Green = breakfast_green
+        self.Breakfast_Yellow = breakfast_yellow
+        self.Breakfast_Red = breakfast_red
+        self.Lunch_Green = lunch_green
+        self.Lunch_Yellow = lunch_yellow
+        self.Lunch_Red = lunch_red
+        self.Dinner_Green = dinner_green
+        self.Dinner_Yellow = dinner_yellow
+        self.Dinner_Red = dinner_red
+        self.Snacks_Green = snacks_green
+        self.Snacks_Yellow = snacks_yellow
+        self.Snacks_Red = snacks_red
+        self.Weight = weight
+        self.Steps = steps
 
-# df = pd.read_sql_table('productlist', con=db.engine)
-# print(df)
+df = pd.read_sql_table('nutrition_table', con=db.engine)
+print(df)
 # ------------------------------------------------------------------------------------------------
 
 ### calorie plot
