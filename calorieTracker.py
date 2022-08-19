@@ -370,7 +370,6 @@ def df_to_csv(n_clicks, n_intervals, dataset, s):
               Output(component_id='pct-graph', component_property='figure'),
               [Input(component_id='my-date-range-picker',component_property='start_date')],
                [Input(component_id='my-date-range-picker',component_property='end_date')])
-
 def update_cal_graph(start_date,end_date):
 
     start_date = dt.datetime.strptime(start_date,'%Y-%m-%d').date()
@@ -422,7 +421,7 @@ def update_cal_graph(start_date,end_date):
     cal_fig.update_layout(barmode='stack')
     cal_fig.update_layout(title_text='Daily Calorie and Calorie Density Breakdown', title_x=0.5)
     cal_fig.update_xaxes(fixedrange=True,tickformat="%m/%d/%Y")
-    cal_fig.update_xaxes(dtick=86400000)
+    # cal_fig.update_xaxes(dtick=86400000)
     cal_fig.update_layout(xaxis=dict(tickformat="%m/%d/%Y"))
 
 
@@ -445,7 +444,7 @@ def update_cal_graph(start_date,end_date):
     }
 
     weight_fig.update_layout({'annotations': [annotation]})
-    weight_fig.update_xaxes(dtick=86400000)
+    # weight_fig.update_xaxes(dtick=86400000)
     weight_fig.update_layout(xaxis=dict(tickformat="%m/%d/%Y"))
 
     ### exercise plot
@@ -465,7 +464,7 @@ def update_cal_graph(start_date,end_date):
     }
 
     exercise_fig.update_layout({'annotations': [annotation]})
-    exercise_fig.update_xaxes(dtick=86400000)
+    # exercise_fig.update_xaxes(dtick=86400000)
     exercise_fig.update_layout(xaxis=dict(tickformat="%m/%d/%Y"))
 
     ### calorie breakdown chart
