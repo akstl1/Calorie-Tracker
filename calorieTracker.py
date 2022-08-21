@@ -78,12 +78,10 @@ for col in df.columns:
 # ------------------------------------------------------------------------------------------------
 
 ### calorie plot
-# df = pd.read_excel('./data_df.xlsx', 'df',converters = {'Date':dt.datetime.date}).fillna(0)
 
 df['Daily_Green'] = df.Breakfast_Green+df.Lunch_Green+df.Dinner_Green+df.Snacks_Green
 df['Daily_Yellow'] = df.Breakfast_Yellow+df.Lunch_Yellow+df.Dinner_Yellow+df.Snacks_Yellow
 df['Daily_Red'] = df.Breakfast_Red+df.Lunch_Red+df.Dinner_Red+df.Snacks_Red
-# df.Date = df.Date.apply(lambda x:dt.datetime.strptime(x,'%m/%d/%Y').date())
 
 cal_fig = go.Figure()
 cal_fig.add_trace(go.Bar(
@@ -233,6 +231,7 @@ end_date = dt.datetime.strptime(dt.datetime.today().strftime("%m/%d/%Y"),'%m/%d/
 
 app.layout = html.Div([
         # create a div to store each graph
+        html.Div([html.H1('Physical Health Dashboard')],style={'text-align':'center'}),
         html.Div([
         dcc.DatePickerRange(id='my-date-range-picker',
     start_date=start_date,
@@ -242,8 +241,8 @@ app.layout = html.Div([
     max_date_allowed = max_date
 )
         ], style={'text-align':'center'}),
-        html.Div([dcc.Graph(id='cal-graph',figure=cal_fig)]),
         html.Div([dcc.Graph(id='weight-graph',figure=weight_fig)]),
+        html.Div([dcc.Graph(id='cal-graph',figure=cal_fig)]),
         html.Div([dcc.Graph(id='exercise-graph',figure=exercise_fig)]),
         html.Div([dcc.Graph(id='pct-graph',figure=pct_fig)]),
         html.Div([
@@ -263,16 +262,22 @@ app.layout = html.Div([
         # Create notification when saving to excel
         html.Div(id='placeholder', children=[]),
         dcc.Store(id="store", data=0),
-        # dcc.Interval(id='interval', interval=1000)
-
+        dcc.Interval(id='interval', interval=86400000*7),
+        html.Div([html.H1('-')], style={'opacity':'0'})
 ])
 
 
 ## -------------------------------------------------------------------------------------------------
 @app.callback(Output('postgres_datatable', 'children'),
-              [Input('interval_pg', 'n_intervals')])
-def populate_datatable(n_intervals):
+              [Input('interval_pg', 'n_intervals')],
+              [Input(component_id='my-date-range-picker',component_property='start_date')],
+               [Input(component_id='my-date-range-picker',component_property='end_date')])
+def populate_datatable(n_intervals,start_date,end_date):
+    start_date = dt.datetime.strptime(start_date,'%Y-%m-%d').date()
+    end_date = dt.datetime.strptime(end_date,'%Y-%m-%d').date()
     df = pd.read_sql_table('nutrition_table', con=db.engine)
+    df.Date = df.Date.apply(lambda x:dt.datetime.strptime(x,'%Y-%m-%d').date())
+    df = df[(df.Date>=start_date) & (df.Date<=end_date)]
     return [
         dash_table.DataTable(
             id='our-table',
@@ -335,8 +340,8 @@ def add_row(n_clicks, rows, columns):
 @app.callback(
     [Output('placeholder', 'children'),
      Output("store", "data")],
-    [Input('save_to_postgres', 'n_clicks')
-     # Input("interval", "n_intervals")
+    [Input('save_to_postgres', 'n_clicks'),
+     Input("interval", "n_intervals")
      ],
     [State('our-table', 'data'),
      State('store', 'data')],
