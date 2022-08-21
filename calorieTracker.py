@@ -22,10 +22,11 @@ load_dotenv()
 
 # start up app, server
 # server = Flask(__name__)
-server=app.server
 app = dash.Dash(__name__, server=server, suppress_callback_exceptions=True)
+server=app.server
 app.server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+#
 # for your live Heroku PostgreSQL database
 app.server.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("URI")
 
