@@ -21,7 +21,8 @@ from flask import Flask
 load_dotenv()
 
 # start up app, server
-server = Flask(__name__)
+# server = Flask(__name__)
+server=app.server
 app = dash.Dash(__name__, server=server, suppress_callback_exceptions=True)
 app.server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
